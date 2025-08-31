@@ -70,6 +70,11 @@ function openPlan(plan: Plan) {
   setPlanData(plan[0], plan[1], plan[2])
 }
 
+function openSample(index: number) {
+  const currentPath = inject("currentPath")
+  currentPath.value = "/plans/" + index
+}
+
 function editPlan(plan: Plan) {
   loadPlan(plan)
 }
@@ -141,8 +146,8 @@ function handleDrop(event: DragEvent) {
                 v-for="(sample, index) in samples"
                 :key="index"
                 class="dropdown-item"
-                v-on:click.prevent="loadPlan(sample)"
-                href=""
+                v-on:click.prevent="openSample(index)"
+                :href="'/plans/' + index"
               >
                 {{ sample[0] }}
               </a>

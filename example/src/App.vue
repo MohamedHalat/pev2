@@ -14,12 +14,37 @@ const routes = {
 const currentPath = ref("/")
 provide("currentPath", currentPath)
 
+import samples from "./samples"
+
+const planId = ref<number | null>(null)
+
 const currentView = computed(() => {
-  return routes[currentPath.value] || NotFoundView
+  const path = currentPath.value
+  const match = path.match(/^\/plans\/(\d+)$/)
+  if (match) {
+    planId.value = Number(match[1])
+    return PlanView
+  }
+  planId.value = null
+  return routes[path] || NotFoundView
 })
 
 const planData = ["", "", ""]
 provide("planData", planData)
+
+const currentProps = computed(() => {
+  if (planId.value !== null) {
+    const sample = samples[planId.value]
+    if (sample) {
+      return {
+        planSource: sample[1],
+        planQuery: sample[2],
+        title: sample[0],
+      }
+    }
+  }
+  return {}
+})
 
 function setPlanData(name, plan, query) {
   planData[0] = plan
@@ -29,8 +54,12 @@ function setPlanData(name, plan, query) {
 }
 provide("setPlanData", setPlanData)
 window.setPlanData = setPlanData
+
+window.onpopstate = () => {
+  currentPath.value = window.location.pathname
+}
 </script>
 
 <template>
-  <component :is="currentView" />
+  <component :is="currentView" v-bind="currentProps" />
 </template>
